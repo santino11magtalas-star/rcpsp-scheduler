@@ -7,7 +7,6 @@
 # 3. Slack = LS - ES means on how much can a task slip
 # * a task is "critical" if slack ==0. Which means the critical path is the chain of critical tasks from source to sink
 
-
 from __future__ import annotations 
 from dataclasses import dataclass
 
