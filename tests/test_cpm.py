@@ -41,7 +41,7 @@ def test_simple_chain():
     2: Activity(id=2, duration=5, successors=[3]),
     3: Activity(id=3, duration=3, successors=[]),
   }
-  p = Project(activites=acts, capacities={"R1" : 1})
+  p = Project(activities=acts, capacities={"R1" : 1})
   r = critical_path_method(p)
   assert r.makespan == 8 
   assert r.critical_path() == [1,2,3]
