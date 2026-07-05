@@ -8,6 +8,9 @@
 # The order matters, a smarter order gives a shorter schedule and will be choosing the ff:
 # order is priority.py's job, then here we default to a topological order, which is always precedence -feasible. ref Kolish (1996), serial/parallel SGS.
 
+from __future__ import annotations
+from .model import Schedule
+
 def _fits(act, start, usage, caps):
     for t in range(start, start + act.duration):  # can this task run over [start, start+duration) without busting a resource?
         for r, need in act.requests.items():
