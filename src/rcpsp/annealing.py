@@ -7,7 +7,10 @@
 # 5. reference: Kirkpatrick et al. (1983); Bouleimen & Lecocq (2003).
 
 from __future__ import annotations
-from .cpm import critical_path_method
+import math
+import random 
+from .priority import priority_order
+from .sgs import serial_sgs 
 
 def makespan(project, order):
   return serial_sgs(project, order=order).makespan
