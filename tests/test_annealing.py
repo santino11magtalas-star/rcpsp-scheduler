@@ -1,9 +1,10 @@
 # run tests for the simulated annealing optimizer
 # to run: PYTHONPATH=src python -m pytest -q
 
-from pathlib import Path 
-from rcpsp import (critical_path_method, is_feasible, parse_sm, priority_order, serial_sgs, simulated_annealing)
-sample = Path(__file__).resolve().parents[1]/"data"/"psplib"/"sample_j6.sm"
+from pathlib import Path
+from rcpsp import (critical_path_method, is_feasible, parse_sm, priority_order,
+                   serial_sgs, simulated_annealing)
+SAMPLE = Path(__file__).resolve().parents[1] / "data" / "psplib" / "sample_j6.sm"
 
 def test_result_is_feasible():
     p = parse_sm(SAMPLE)
