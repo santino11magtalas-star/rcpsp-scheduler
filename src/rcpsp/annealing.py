@@ -8,12 +8,12 @@
 
 from __future__ import annotations
 import math
-import random 
+import random
 from .priority import priority_order
-from .sgs import serial_sgs 
+from .sgs import serial_sgs
 
-def makespan(project, order):
-  return serial_sgs(project, order=order).makespan
+def _makespan(project, order):
+    return serial_sgs(project, order=order).makespan
 
 def _neighbor(project, order, rng):
     # swap two adjacent tasks, but only if it stays legal.
@@ -27,8 +27,7 @@ def _neighbor(project, order, rng):
             order[i], order[i + 1] = b, a
             return order
     return order   # couldn't find one, leave it unchanged
- 
- 
+
 def simulated_annealing(project, iterations=2000, t_start=2.0,
                         cooling=0.995, rule="lft", seed=None):
     rng = random.Random(seed)
@@ -46,6 +45,4 @@ def simulated_annealing(project, iterations=2000, t_start=2.0,
             if current_ms < best_ms:
                 best, best_ms = current, current_ms
         temp *= cooling
- 
     return serial_sgs(project, order=best)
- 
