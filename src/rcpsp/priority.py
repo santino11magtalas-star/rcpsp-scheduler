@@ -6,7 +6,7 @@
 # 4. If a "tweak" makes it shorter, keep it but if it makes it longer we still keep it but depends on the situation. 
 # 5. reference: Kirkpatrick et al. (1983); Bouleimen & Lecocq (2003).
 
-from __future import annotations
+from __future__ import annotations
 import random
 import math
 from .priority import priority_order
