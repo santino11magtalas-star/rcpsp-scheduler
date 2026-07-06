@@ -28,21 +28,23 @@ def serial_sgs(project, order=None):
         order = project.topological_order()
     acts = project.activities
     caps = project.capacities
-    usage = {r: {} for r in caps}   # usage[resource][time] = amount used
+    usage = {r: {} for r in caps}
     starts = {}
- 
+    # hard ceiling: a schedule can never be longer than every task run
+    # back-to-back, so cap the search there to guarantee we always stop.
+    horizon = sum(a.duration for a in acts.values()) + 1
     for j in order:
-        act = acts[j]   # earliest we could start: right after every predecessor finishes
+        act = acts[j]
         preds = project.predecessors(j)
-        est = max((starts[p] + acts[p].duration for p in preds), default=0)
-        # push it later one step at a time until the resources actually fit
-        # (NOTE: assumes each task's demand <= capacity, which holds in PSPLIB)
+        # only count predecessors that are already placed (keeps a bad order
+        # from producing a wrong earliest-start and looping forever)
+        est = max((starts[p] + acts[p].duration
+                   for p in preds if p in starts), default=0)
         t = est
-        while not _fits(act, t, usage, caps):
+        while t < horizon and not _fits(act, t, usage, caps):
             t += 1
         starts[j] = t
         _place(act, t, usage)
- 
     return Schedule(project=project, starts=starts)
  
 def is_feasible(project, schedule):
@@ -55,7 +57,6 @@ def is_feasible(project, schedule):
         for s in act.successors:
             if starts[j] + act.duration > starts[s]:
                 return False
- 
     # resources: rebuild the usage profile and check nothing exceeds capacity
     usage = {r: {} for r in project.capacities}
     for j, act in acts.items():
