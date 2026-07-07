@@ -55,6 +55,8 @@ def parse_sm(path):
         if len(parts) < 3 or not parts[0].isdigit():
             continue
         job = int(parts[0])
+        if job not in activities:
+            continue
         activities[job].duration = int(parts[2])
         demands = [int(x) for x in parts[3:3 + n_renew]]
         activities[job].requests = dict(zip(resource_names, demands))

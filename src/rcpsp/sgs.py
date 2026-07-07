@@ -9,59 +9,62 @@
 # order is priority.py's job, then here we default to a topological order, which is always precedence -feasible. ref Kolish (1996), serial/parallel SGS.
 
 from __future__ import annotations
+
 from .model import Schedule
 
+
 def _fits(act, start, usage, caps):
-    for t in range(start, start + act.duration):  # can this task run over [start, start+duration) without busting a resource?
+    for t in range(start, start + act.duration):
         for r, need in act.requests.items():
             if usage[r].get(t, 0) + need > caps[r]:
                 return False
     return True
- 
+
+
 def _place(act, start, usage):
-    for t in range(start, start + act.duration):  # mark the task's resource use across the time steps it occupies
+    for t in range(start, start + act.duration):
         for r, need in act.requests.items():
             usage[r][t] = usage[r].get(t, 0) + need
- 
+
+
 def serial_sgs(project, order=None):
     if order is None:
         order = project.topological_order()
     acts = project.activities
     caps = project.capacities
-    usage = {r: {} for r in caps}   # usage[resource][time] = amount used
+    usage = {r: {} for r in caps}
     starts = {}
- 
+
+    horizon = sum(a.duration for a in acts.values()) + 1
+
     for j in order:
-        act = acts[j]   # earliest we could start: right after every predecessor finishes
+        act = acts[j]
         preds = project.predecessors(j)
-        est = max((starts[p] + acts[p].duration for p in preds), default=0)
-        # push it later one step at a time until the resources actually fit
-        # (NOTE: assumes each task's demand <= capacity, which holds in PSPLIB)
+        est = max((starts[p] + acts[p].duration
+                   for p in preds if p in starts), default=0)
         t = est
-        while not _fits(act, t, usage, caps):
+        while t < horizon and not _fits(act, t, usage, caps):
             t += 1
         starts[j] = t
         _place(act, t, usage)
- 
+
     return Schedule(project=project, starts=starts)
- 
+
+
 def is_feasible(project, schedule):
-    # sanity check used by the tests: no precedence broken, no resource
-    # ever over capacity.
     acts = project.activities
     starts = schedule.starts
-    # precedence: every task must finish before its successors start
+
     for j, act in acts.items():
         for s in act.successors:
             if starts[j] + act.duration > starts[s]:
                 return False
- 
-    # resources: rebuild the usage profile and check nothing exceeds capacity
+
     usage = {r: {} for r in project.capacities}
     for j, act in acts.items():
         _place(act, starts[j], usage)
     for r, cap in project.capacities.items():
         if any(used > cap for used in usage[r].values()):
             return False
+
     return True
- 
