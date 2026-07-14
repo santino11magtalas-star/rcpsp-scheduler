@@ -1,14 +1,12 @@
-# experiments.py -- the three studies our prof asked for:
+# experiments.py: what does it do?
 #   1. GROUND TRUTH  : how close do our methods get to the TRUE optimum?
 #                      (our answer to "Christofides is within 1.5x optimal")
 #   2. CONVERGENCE   : does annealing approach the optimum as we give it more
 #                      time (iterations)?
 #   3. COMPLEXITY    : does measured runtime match the theoretical growth?
-#
 # parts 1 and 2 use small instances where branch & bound gives the true
 # optimum, so they are fully self-contained and reproducible.
 # part 3 uses the real PSPLIB sets for the runtime-vs-size story.
-#
 # run:  PYTHONPATH=src python3 experiments.py
 
 import csv
@@ -17,10 +15,7 @@ import math
 import random
 import time
 import tracemalloc
-
-from rcpsp import (Activity, Project, branch_and_bound, critical_path_method,
-                   parse_sm, priority_order, serial_sgs, simulated_annealing)
-
+from rcpsp import (Activity, Project, branch_and_bound, critical_path_method, parse_sm, priority_order, serial_sgs, simulated_annealing)
 
 def make_small(seed, n_real=7, cap=4):
     """A small instance the exact solver can solve to optimality."""
@@ -40,7 +35,6 @@ def make_small(seed, n_real=7, cap=4):
         acts[j] = Activity(id=j, duration=d, successors=succ[j], requests=r)
     return Project(activities=acts, capacities={"R1": cap})
 
-
 def _random_order(p, rng):
     chosen, cs, rem = [], set(), set(p.activities)
     while rem:
@@ -48,7 +42,6 @@ def _random_order(p, rng):
         nxt = rng.choice(elig)
         chosen.append(nxt); cs.add(nxt); rem.discard(nxt)
     return chosen
-
 
 def _swap(p, order, rng):
     order = list(order); n = len(order)
@@ -58,7 +51,6 @@ def _swap(p, order, rng):
             order[i], order[i + 1] = b, a
             return order
     return order
-
 
 def _anneal_from_random(p, iterations, seed):
     """Annealing started from a RANDOM order, so we can watch it converge."""
@@ -74,12 +66,10 @@ def _anneal_from_random(p, iterations, seed):
         temp *= 0.99
     return best
 
-
 def gap(ms, base):
     return (ms - base) / base * 100 if base else 0.0
 
-
-# --- 1. GROUND TRUTH -------------------------------------------------------
+# 1. GROUND TRUTH
 def experiment_optimal(n=40):
     print("\n=== 1. GROUND TRUTH: gap above the TRUE optimum ===")
     print("(small instances solved exactly by branch & bound)\n")
@@ -102,8 +92,7 @@ def experiment_optimal(n=40):
     with open("exp_optimal.csv", "w", newline="") as f:
         csv.writer(f).writerows([["instance", "optimum", "lft", "annealing"]] + rows)
 
-
-# --- 2. CONVERGENCE --------------------------------------------------------
+# 2. CONVERGENCE 
 def experiment_convergence(n=40):
     print("\n=== 2. CONVERGENCE: approaching the optimum with more time ===")
     print("(annealing from a random start; avg gap above the true optimum)\n")
@@ -122,8 +111,7 @@ def experiment_convergence(n=40):
     with open("exp_convergence.csv", "w", newline="") as f:
         csv.writer(f).writerows([["iterations", "avg_gap_above_optimum"]] + rows)
 
-
-# --- 3. COMPLEXITY: time AND space -----------------------------------------
+# 3. COMPLEXITY: time & space 
 def experiment_complexity(sample=20):
     print("\n=== 3. COMPLEXITY: time AND space vs instance size ===")
     print("(theory: SGS time ~ O(n * horizon), space ~ O(resources * horizon))\n")
@@ -157,8 +145,6 @@ def experiment_complexity(sample=20):
     with open("exp_complexity.csv", "w", newline="") as f:
         csv.writer(f).writerows(
             [["set", "tasks", "avg_time_ms", "avg_peak_kb"]] + rows)
-
-
 if __name__ == "__main__":
     experiment_optimal()
     experiment_convergence()
