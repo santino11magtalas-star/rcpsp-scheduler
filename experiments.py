@@ -1,11 +1,8 @@
 # experiments.py:
 #   1. GROUND TRUTH  : how close do our methods get to the TRUE optimum?
-#                      (our answer to "Christofides is within 1.5x optimal")
-#   2. CONVERGENCE   : does annealing approach the optimum as we give it more
-#                      time (iterations)?
+#   2. CONVERGENCE   : does annealing approach the optimum as we give it more time "iterations"?
 #   3. COMPLEXITY    : does measured runtime match the theoretical growth?
-# parts 1 and 2 use small instances where branch & bound gives the true
-# optimum, so they are fully self-contained and reproducible.
+# parts 1 and 2 use small instances where branch & bound gives the true optimum, so they are fully self-contained and reproducible.
 # part 3 uses the real PSPLIB sets for the runtime-vs-size story.
 # run:  PYTHONPATH=src python3 experiments.py
 
